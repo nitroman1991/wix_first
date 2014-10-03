@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <?define ProductName="MyFileInstaller1" ?>
+  <?define Folder="MyFolder" ?>
+  <?define ProductVersion="1.0" ?>
+  <?define UpgradeCode="06a81104-1e30-463d-87e1-e8a79b4c682a"?>
+  <?define Manufacturer="Myself"?>
+
+  <Product Id="*" Name="$(var.ProductName)" Language="1049" Version="$(var.ProductVersion)" Manufacturer="$(var.Manufacturer)" UpgradeCode="$(var.UpgradeCode)">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
+
+    <MediaTemplate />
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="$(var.Folder)">
+          <Component Id="ProductComponent" Guid="*">
+            <File Id='Myfile' DiskId='1' Source='.\MyFile.txt'/>
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+
+
+    <Binary Id="writeData" SourceFile=".\ConsoleApplication3.dll" />
+    <CustomAction Id="SetParams" Property="InFile" Value=",[Date] ![Time] ;[INSTALLFOLDER]" />
+    <CustomAction Id="InFile" BinaryKey="writeData" DllEntry="TargetFunction" Return="check" Execute="deferred" Impersonate="no" HideTarget="no" />
+    
+    <InstallExecuteSequence>
+      <Custom Action="SetParams" After="InstallFiles" />
+      <Custom Action="InFile" After="SetParams" />
+    </InstallExecuteSequence>
+    
+    <Feature Id="ProductFeature" Title="$(var.ProductName)" Level="1">
+      <ComponentRef Id="ProductComponent" />
+    </Feature>
+  </Product>
+
+
+</Wix>
